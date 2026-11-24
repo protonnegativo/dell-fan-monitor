@@ -1,0 +1,71 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: dell-fan-monitor\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Dell Fan Monitor"
+msgstr "Monitor e Ventoinha"
+
+msgid "Automatic"
+msgstr "Automática"
+
+msgid "Low"
+msgstr "Baixa"
+
+msgid "Maximum"
+msgstr "Máxima"
+
+msgid "Cool"
+msgstr "Frio"
+
+msgid "Quiet"
+msgstr "Silencioso"
+
+msgid "Balanced"
+msgstr "Balanceado"
+
+msgid "Performance"
+msgstr "Desempenho"
+
+msgid "Low power"
+msgstr "Economia de energia"
+
+msgid "Balanced performance"
+msgstr "Desempenho balanceado"
+
+msgid "Fan"
+msgstr "Ventoinha"
+
+msgid "Thermal profile"
+msgstr "Perfil térmico"
+
+msgid "Install the helper to change fan speed and thermal profile"
+msgstr "Instale o ajudante para mudar a ventoinha e o perfil térmico"
+
+msgid "RAM %d%%"
+msgstr "RAM %d%%"
+
+msgid "CPU: %s"
+msgstr "CPU: %s"
+
+msgid "RAM: %s of %s GB (%d%%)"
+msgstr "RAM: %s de %s GB (%d%%)"
+
+msgid "RAM: %s"
+msgstr "RAM: %s"
+
+msgid "Temperature: %s"
+msgstr "Temperatura: %s"
+
+msgid "%s rpm"
+msgstr "%s rpm"
+
+msgid "Fans: %s"
+msgstr "Ventoinhas: %s"
+
+msgid "CPU at %d °C: the fan is back on automatic control."
+msgstr "CPU a %d °C: a ventoinha voltou para o controle automático."

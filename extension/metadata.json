@@ -1,0 +1,9 @@
+{
+  "uuid": "dell-fan-monitor@protonnegativo.github.io",
+  "name": "Dell Fan Monitor",
+  "description": "CPU temperature and RAM usage in the top bar, with a menu to set fan speed and thermal profile on Dell laptops. Fan and profile switching need the bundled helper (see the project page).",
+  "shell-version": ["50"],
+  "gettext-domain": "dell-fan-monitor",
+  "url": "https://github.com/protonnegativo/dell-fan-monitor",
+  "version": 1
+}
