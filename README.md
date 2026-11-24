@@ -6,6 +6,12 @@ thermal profile with one click.
 
 [Português (Brasil)](README.pt-BR.md)
 
+![Collapsed, in the top bar](docs/collapsed.png)
+
+![Menu open](docs/open.png)
+
+The screenshots show the Portuguese translation.
+
 ## What it does
 
 - **Top bar:** CPU temperature and RAM usage, refreshed every 3 seconds.

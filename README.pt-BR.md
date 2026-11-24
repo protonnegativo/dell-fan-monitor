@@ -6,6 +6,10 @@ velocidade da ventoinha e o perfil térmico com um clique.
 
 [English](README.md)
 
+![Recolhido, na barra de cima](docs/collapsed.png)
+
+![Menu aberto](docs/open.png)
+
 ## O que ela faz
 
 - **Barra de cima:** temperatura da CPU e uso de RAM, atualizados a cada 3
