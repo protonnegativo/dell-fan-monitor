@@ -2,55 +2,79 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Root helper for the "Dell Fan Monitor" GNOME Shell extension.
-# It only accepts the fixed arguments below and only writes to sysfs.
+# It only accepts the fixed arguments below. It writes to sysfs, to its
+# state file in /run and to the saved mode in /var/lib.
 #
 #   dell-fan-monitor-helper fan auto|low|high
 #   dell-fan-monitor-helper profile <one of platform_profile_choices>
+#   dell-fan-monitor-helper restore    (re-apply the saved fan mode)
 set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
-STATE=/run/dell-fan-monitor
+STATE=/run/dell-fan-monitor                # read by the extension
+SAVED=/var/lib/dell-fan-monitor/mode       # survives a reboot
 PROFILE=/sys/firmware/acpi/platform_profile
 
 usage() {
-  echo "usage: $0 fan auto|low|high | profile <name>" >&2
+  echo "usage: $0 fan auto|low|high | profile <name> | restore" >&2
   exit 2
 }
 
 hwmon() {
-  for d in /sys/class/hwmon/hwmon*; do
-    if [ "$(cat "$d/name" 2>/dev/null)" = dell_smm ]; then
-      echo "$d"
-      return 0
-    fi
+  # At boot the dell_smm module can take a few seconds to show up.
+  i=0
+  while [ "$i" -lt "${WAIT:-1}" ]; do
+    for d in /sys/class/hwmon/hwmon*; do
+      if [ "$(cat "$d/name" 2>/dev/null)" = dell_smm ]; then
+        echo "$d"
+        return 0
+      fi
+    done
+    i=$((i + 1))
+    [ "$i" -lt "${WAIT:-1}" ] && sleep 1
   done
   echo "dell_smm hwmon device not found" >&2
   exit 1
 }
 
-[ $# -eq 2 ] || usage
+apply() {
+  H=$(hwmon)
+  case "$1" in
+    auto)
+      # 2 = hand fan control back to the firmware
+      echo 2 > "$H/pwm1_enable"
+      ;;
+    low|high)
+      if [ "$1" = low ]; then V=128; else V=255; fi
+      # After a suspend the controller can stay in manual mode with the fans
+      # stopped. Handing control back to the firmware first makes it obey.
+      echo 2 > "$H/pwm1_enable" 2>/dev/null || true
+      # 1 = manual control; the firmware stops adjusting the fans
+      echo 1 > "$H/pwm1_enable"
+      for p in "$H"/pwm[0-9]; do
+        echo "$V" > "$p"
+      done
+      ;;
+    *) usage ;;
+  esac
+  echo "$1" > "$STATE"
+  chmod 644 "$STATE"
+}
 
-case "$1" in
+case "${1:-}" in
   fan)
-    H=$(hwmon)
-    case "$2" in
-      auto)
-        # 2 = hand fan control back to the firmware
-        echo 2 > "$H/pwm1_enable"
-        ;;
-      low|high)
-        if [ "$2" = low ]; then V=128; else V=255; fi
-        # 1 = manual control; the firmware stops adjusting the fans
-        echo 1 > "$H/pwm1_enable"
-        for p in "$H"/pwm[0-9]; do
-          echo "$V" > "$p"
-        done
-        ;;
-      *) usage ;;
-    esac
-    echo "$2" > "$STATE"
-    chmod 644 "$STATE"
+    [ $# -eq 2 ] || usage
+    apply "$2"
+    mkdir -p "$(dirname "$SAVED")"
+    echo "$2" > "$SAVED"
+    ;;
+  restore)
+    [ $# -eq 1 ] || usage
+    M=$(cat "$SAVED" 2>/dev/null || echo auto)
+    case "$M" in auto|low|high) ;; *) M=auto ;; esac
+    WAIT=20 apply "$M"
     ;;
   profile)
+    [ $# -eq 2 ] || usage
     for c in $(cat "${PROFILE}_choices"); do
       if [ "$c" = "$2" ]; then
         echo "$2" > "$PROFILE"

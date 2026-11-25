@@ -61,12 +61,16 @@ instalado. Sem ele a extensão é instalada em inglês.
 ### O que é o ajudante
 
 Mudar a velocidade da ventoinha exige escrever em arquivos que só o root pode
-alterar. Por isso `sudo make install-helper` instala duas coisas:
+alterar. Por isso `sudo make install-helper` instala três coisas:
 
 - `/usr/local/sbin/dell-fan-monitor-helper`: um script curto que só aceita
-  `fan auto|low|high` e `profile <nome>`, e só escreve nos arquivos de
-  ventoinha e de perfil térmico em `/sys`. Leia antes de instalar:
+  `fan auto|low|high`, `profile <nome>` e `restore`. Ele escreve nos arquivos
+  de ventoinha e de perfil térmico em `/sys` e guarda o modo escolhido em
+  `/var/lib/dell-fan-monitor/mode`. Leia antes de instalar:
   [helper/dell-fan-monitor-helper](helper/dell-fan-monitor-helper).
+- `dell-fan-monitor-restore.service`: uma unidade do systemd que roda
+  `dell-fan-monitor-helper restore` no boot e toda vez que o notebook volta
+  da suspensão, para o modo escolhido valer de novo.
 - Uma regra do polkit que deixa o usuário local logado rodar esse script sem
   digitar senha. Sessões remotas e inativas continuam pedindo autenticação de
   administrador.
@@ -81,7 +85,10 @@ Sem o ajudante a extensão continua funcionando como monitor.
   Essa checagem roda dentro da extensão, então só funciona com você logado e
   a extensão ativa.
 - Não existe opção de desligar as ventoinhas.
-- O controle da ventoinha volta ao automático a cada reinício.
+- Depois de uma suspensão o controlador pode ficar em modo manual com as
+  ventoinhas paradas. O serviço reaplica o seu modo alguns segundos depois
+  de o notebook voltar, e a extensão faz o mesmo se ler 0 rpm duas vezes
+  seguidas.
 - Este software não tem garantia. Use o controle manual por sua conta e
   risco.
 

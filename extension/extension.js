@@ -185,17 +185,27 @@ class Indicator extends PanelMenu.Button {
             : _('RAM: %s').format('—');
         this._tempItem.label.text = _('Temperature: %s').format(temp === null ? '—' : `${temp} °C`);
 
+        const rpms = [];
         if (this._dellSmm) {
             const fans = [];
             for (const n of [1, 2, 3]) {
                 const rpm = readText(`${this._dellSmm}/fan${n}_input`);
-                if (rpm !== null)
+                if (rpm !== null) {
                     fans.push(_('%s rpm').format(rpm));
+                    rpms.push(Number(rpm));
+                }
             }
             this._fanItem.label.text = _('Fans: %s').format(fans.length ? fans.join(' / ') : '—');
         }
 
         const fanMode = readText(STATE_FILE) ?? 'auto';
+
+        // Manual mode with every fan stopped happens after a suspend. After
+        // two readings in a row at 0 rpm, re-apply the saved mode.
+        const stalled = fanMode !== 'auto' && rpms.length > 0 && rpms.every(r => r === 0);
+        this._stalled = stalled ? (this._stalled ?? 0) + 1 : 0;
+        if (this._stalled === 2)
+            this._run(['restore']);
         for (const [mode, item] of this._fanItems)
             item.setOrnament(mode === fanMode ? PopupMenu.Ornament.DOT : PopupMenu.Ornament.NONE);
 

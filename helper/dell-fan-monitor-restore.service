@@ -1,0 +1,10 @@
+[Unit]
+Description=Dell Fan Monitor: re-apply the saved fan mode (boot and resume)
+After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 3; /usr/local/sbin/dell-fan-monitor-helper restore'
+
+[Install]
+WantedBy=multi-user.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target

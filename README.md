@@ -62,12 +62,16 @@ installed. Without it the extension is installed in English.
 ### What the helper is
 
 Changing fan speed means writing to files only root can write. So
-`sudo make install-helper` installs two things:
+`sudo make install-helper` installs three things:
 
 - `/usr/local/sbin/dell-fan-monitor-helper`: a short shell script that
-  accepts only `fan auto|low|high` and `profile <name>`, and only writes to
-  the fan and thermal-profile files in `/sys`. Read it before installing:
+  accepts only `fan auto|low|high`, `profile <name>` and `restore`. It writes
+  to the fan and thermal-profile files in `/sys` and saves the chosen fan
+  mode in `/var/lib/dell-fan-monitor/mode`. Read it before installing:
   [helper/dell-fan-monitor-helper](helper/dell-fan-monitor-helper).
+- `dell-fan-monitor-restore.service`: a systemd unit that runs
+  `dell-fan-monitor-helper restore` at boot and after every resume from
+  suspend, so the fan mode you chose is applied again.
 - A polkit rule that lets the logged-in local user run that one script
   without typing a password. Remote and inactive sessions still need admin
   authentication.
@@ -82,7 +86,9 @@ Without the helper the extension still works as a monitor.
   This check runs inside the extension, so it only works while you are
   logged in with the extension enabled.
 - There is no option to turn the fans off.
-- Fan control goes back to automatic on every reboot.
+- After a suspend the fan controller can stay in manual mode with the fans
+  stopped. The restore service re-applies your mode a few seconds after
+  resume, and the extension does the same if it reads 0 rpm twice in a row.
 - This software comes with no warranty. Use manual fan control at your own
   risk.
 
